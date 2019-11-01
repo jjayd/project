@@ -1,0 +1,7 @@
+f=open('articles.txt','w')
+f1=open('ninput1-1.txt','r')
+f2=open('ninput1-2.txt','r')
+line=f1.readline()
+f.write(line)
+line=f2.readline()
+f.write(line)
