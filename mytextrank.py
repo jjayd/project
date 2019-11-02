@@ -4,8 +4,15 @@ from konlpy.tag import Twitter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import normalize
+from datetime import datetime, timedelta
 import numpy as np
 
+f = open('outtfdf.txt','r')
+exceptx=[]
+while True:
+    line = f.readline()
+    if not line: break
+    exceptx.append(line[:-1])
 
 class SentenceTokenizer(object):
     def __init__(self):
@@ -74,9 +81,6 @@ class Rank(object):
         ranks = np.linalg.solve(A, B) # 연립방정식 Ax = b
         return {idx: r[0] for idx, r in enumerate(ranks)}
 
-
-
-
 class TextRank(object):
     def __init__(self, text):
         self.sent_tokenize = SentenceTokenizer()
@@ -105,7 +109,7 @@ class TextRank(object):
             summary.append(self.sentences[idx])
         return summary
                     
-    def keywords(self, word_num=10):
+    def keywords(self, word_num=20):
         rank = Rank()
         rank_idx = rank.get_ranks(self.words_graph)
         sorted_rank_idx = sorted(rank_idx, key=lambda k: rank_idx[k], reverse=True)
@@ -116,29 +120,44 @@ class TextRank(object):
                             #index.sort()
         for idx in index:
             keywords.append(self.idx2word[idx])
-        return keywords
+        realkeywords=[]
+        cnt=0
+        for i in range(len(keywords)):
+            if keywords[i] in exceptx:
+                continue
+            else:
+                realkeywords.append(keywords[i])
+                cnt=cnt+1
+            if cnt==10:
+                break
+        return realkeywords
 
 #url = 'http://v.media.daum.net/v/20170611192209012?rcmd=r'
 f2 = open('keywordslist.txt','w')
-for i in range(1,11):
+
+for i in range(1,16):
     for j in range(1,4):
         tmp = 'text/news/input'+str(i)+'-'+str(j)+'.txt'
         try:
             f = open(tmp,'r')
-            lines=""
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                lines+=line
-            textrank = TextRank(lines)
-            for row in textrank.summarize(3):
-                print(row)
-            print('keywords: ',textrank.keywords())
-            for k in textrank.keywords():
-                f2.write(k)
-                f2.write(' ')
-            f2.write('\n')
         except:
             continue
 
+        lines=""
+        head=0
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            lines+=line
+            if head==0:
+                lines+=line
+                head=1
+        textrank = TextRank(lines)
+        #    for row in textrank.summarize(3):
+#                print(row)
+        print(i,j,'keywords: ',textrank.keywords())
+        for k in textrank.keywords():
+            f2.write(k)
+            f2.write(' ')
+        f2.write('\n')

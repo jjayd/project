@@ -1,9 +1,12 @@
 f2 = open('articles.txt','w')
 
-for i in range(1,4,1):
+for i in range(1,16,1):
     for j in range(1,4,1):
         t = "input"+str(i)+'-'+str(j)+'.txt'
-        f=open(t,'r')
+        try:
+            f=open(t,'r')
+        except:
+            continue
         lines=""
         while True:
             line = f.readline()
