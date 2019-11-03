@@ -1,5 +1,6 @@
 from newspaper import Article
 from datetime import datetime, timedelta
+import hanja
 
 f1 = open('urllist.txt','r')
 timef = open('subtime.txt','w')
@@ -23,7 +24,7 @@ while True:
     pivot=datetime(2000,1,1)
     timef.write(str((realtime-pivot).days))
     timef.write('\n')
-    '''
+    
    # timelist.append(realtime)
     url = word[3]
     a = Article(url,language='ko')
@@ -34,7 +35,10 @@ while True:
     f = open('./text/news/input'+str(cate)+'-'+str(cate2)+'.txt','w')
     #print(a.title)
     #print(a.text)
-    f.write(a.title)
-    f.write(a.text)
-    '''
+    title = hanja.translate(a.title,'substitution')
+    f.write(title)
+    f.write(".\n")
+    text = hanja.translate(a.text,'substitution')
+    f.write(text)
+    
 

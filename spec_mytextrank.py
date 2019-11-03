@@ -130,7 +130,7 @@ class TextRank(object):
             summary.append(self.sentences[idx])
         return summary
                     
-    def keywords(self, word_num=20):
+    def keywords(self, word_num=30):
         rank = Rank()
         rank_idx = rank.get_ranks(self.words_graph)
         sorted_rank_idx = sorted(rank_idx, key=lambda k: rank_idx[k], reverse=True)
@@ -149,14 +149,14 @@ class TextRank(object):
             else:
                 realkeywords.append(keywords[i])
                 cnt=cnt+1
-            if cnt==10:
+            if cnt==20:
                 break
         return realkeywords
 
 #url = 'http://v.media.daum.net/v/20170611192209012?rcmd=r'
-f2 = open('keywordslist.txt','w')
+f2 = open('spec_keywordslist.txt','w')
 
-for i in range(1,17):
+for i in range(16,17):
     for j in range(1,16):
         tmp = 'text/news/input'+str(i)+'-'+str(j)+'.txt'
         try:

@@ -6,13 +6,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import normalize
 from datetime import datetime, timedelta
 import numpy as np
-import hanja
-from hanja import hangul
 
 f = open('outtfdf.txt','r')
 exceptx=[]
-head=""
-
 while True:
     line = f.readline()
     if not line: break
@@ -48,26 +44,10 @@ class SentenceTokenizer(object):
                     
     def get_nouns(self, sentences):
         nouns = []
-        head.replace('…',' ').replace('"',' ').replace('.',' ')
-        line = head.split()
-        ta=""
-        for a in line:
-            if len(a)>1:
-                ta+=str(a[:2])+" "
-        nouns.append(ta)
-        for sentence in sentences:   
-            tmp=""
+        for sentence in sentences:
             if sentence is not '':
-                for n in line:
-                    if n in sentence and len(n)>1:
-                        tmp+=str(n[:2])+" "
-                for noun in self.twitter.nouns(str(sentence)):
-                    if noun not in self.stopwords and len(noun)>1:
-                        tmp+=str(noun)+" "
-                nouns.append(tmp)
-      #          tmp.append(noun for noun in self.twitter.nouns(str(sentence))
-       #             if noun not in self.stopwords and len(noun) > 1)
-   #     nouns.append(' '.join([str(n) for n in tmp]))
+                nouns.append(' '.join([noun for noun in self.twitter.nouns(str(sentence))
+                    if noun not in self.stopwords and len(noun) > 1]))
         return nouns
 
 class GraphMatrix(object):
@@ -138,7 +118,7 @@ class TextRank(object):
         index=[]
         for idx in sorted_rank_idx[:word_num]:
             index.append(idx)
-     #   index.sort()#####
+                            #index.sort()
         for idx in index:
             keywords.append(self.idx2word[idx])
         realkeywords=[]
@@ -156,24 +136,24 @@ class TextRank(object):
 #url = 'http://v.media.daum.net/v/20170611192209012?rcmd=r'
 f2 = open('keywordslist.txt','w')
 
-for i in range(1,17):
-    for j in range(1,16):
+for i in range(5,6):
+    for j in range(1,2):
         tmp = 'text/news/input'+str(i)+'-'+str(j)+'.txt'
         try:
             f = open(tmp,'r')
         except:
             continue
+
         lines=""
-        headchk=0
+        head=0
         while True:
             line = f.readline()
             if not line:
                 break
-            if headchk==0:
-                head=line
-                headchk=1
-                
             lines+=line
+            if head==0:
+                lines+=line
+                head=1
         textrank = TextRank(lines)
         #    for row in textrank.summarize(3):
 #                print(row)

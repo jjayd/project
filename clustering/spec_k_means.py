@@ -80,9 +80,6 @@ def applysim(m):
                 matrix[i][j]=sim
                 matrix[j][i]=sim
             
-#    print(matrix)
-#    print()
-    print("finish sim")
     for i in range(len(m)):
         for j in range(1,length):
             for k in range(j+1,length):
@@ -103,10 +100,10 @@ def weighted_tfidf(data):
     while True:
         line = f.readline()
         if not line: break
-        time.append(int(line)/100000)
+        time.append(int(line)/100)
     for i,doc in enumerate(tfidfScorer(data)):
         tmp=[]
-   #     tmp.append(time[i])
+        tmp.append(time[i])
         for j in doc:
             tmp.append(j[1])
         wtfidf.append(tmp)
@@ -136,7 +133,7 @@ def tokenize_and_stem(text_file):
 
 def main():
  #   data = pd.read_csv('../wordslist.txt',names=['text'])
-    data = pd.read_csv('../keywordslist.txt',names=['text'])  
+    data = pd.read_csv('../spec_keywordslist.txt',names=['text'])  
     # text data in dataframe and removing stops words
     f = open('../outtfdf.txt')
     sw=[]
@@ -165,7 +162,7 @@ def main():
 
     # Kmeans++
  #   km = SpectralClustering(n_clusters=3,affinity="precomputed",n_neighbors=9)
-    km = KMeans(n_clusters=16, init='k-means++', max_iter=10, n_init=1, verbose=0, random_state=3425)
+    km = KMeans(n_clusters=5, init='k-means++', max_iter=10, n_init=1, verbose=0, random_state=3425)
     km.fit(tfidf_matrix)
     labels = km.labels_
     print(labels)
@@ -194,19 +191,19 @@ def main():
                        1: 'blue',
                        2: 'green',
                        3: 'pink',
-                       4: 'purple',
-                       5: 'yellow',
-                       6: 'orange',
-                       7: 'grey',
-                       8: 'black',
-                       9: 'ivory',
-                       10: 'pink',
-                       11: 'black',
-                       12: 'teal',
-                       13: 'navy',
-                       14: 'brown',
-                       15: 'burgundy',
-                       16: 'black'
+                       4: 'purple'
+          #             5: 'yellow',
+          #             6: 'orange',
+          #             7: 'grey',
+          #             8: 'black',
+         #              9: 'ivory',
+         #              10: 'pink',
+         #              11: 'black',
+         #              12: 'teal',
+         #              13: 'navy',
+         #              14: 'brown',
+         #              15: 'burgundy',
+         #              16: 'black'
 			}
 
     csv = open(os.path.join(path, 'results\kmeans_clustered_output.txt'), 'w')
