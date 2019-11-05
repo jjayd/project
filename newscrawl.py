@@ -9,10 +9,15 @@ tcnt=1
 timelist = []
 while True:
     print(cnt,tcnt)
-    cnt+=1
     tcnt+=1
-    if tcnt==4:
-        tcnt=1
+    if cnt<=15:
+        if tcnt==4:
+            tcnt=1
+            cnt+=1
+    else:
+        if tcnt==16:
+            tcnt=1
+            cnt+=1
     lines = f1.readline()
     if not lines:
         break
@@ -31,6 +36,7 @@ while True:
     a.download()
     a.parse()
     if not a.text:
+        print("\thoho: ",cate,cate2)
         continue
     f = open('./text/news/input'+str(cate)+'-'+str(cate2)+'.txt','w')
     #print(a.title)

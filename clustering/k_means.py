@@ -21,6 +21,34 @@ from gensim.models import KeyedVectors
 path = os.path.abspath(os.path.dirname(__file__))
 
 allwords=[]
+model = KeyedVectors.load_word2vec_format('../wiki.ko.vec')
+
+
+def elbow_plot(data, maxK=10, seed_centroids=None):
+    """
+        parameters:
+        - data: pandas DataFrame (data to be fitted)
+        - maxK (default = 10): integer (maximum number of clusters with which to run k-means)
+        - seed_centroids (default = None ): float (initial value of centroids for k-means)
+    """
+    sse = {}
+    for k in range(1, maxK):
+        print("k: ", k)
+        if seed_centroids is not None:
+            seeds = seed_centroids.head(k)
+            kmeans = KMeans(n_clusters=k, max_iter=500, n_init=100, random_state=0, init=np.reshape(seeds, (k,1))).fit(data)
+            data["clusters"] = kmeans.labels_
+        else:
+            kmeans = KMeans(n_clusters=k, max_iter=300, n_init=100, random_state=0).fit(data)
+            data["clusters"] = kmeans.labels_
+        # Inertia: Sum of distances of samples to their closest cluster center
+        sse[k] = kmeans.inertia_
+    
+    plt.figure()
+    plt.plot(list(sse.keys()), list(sse.values()))
+    #plt.show()
+    plt.savefig(os.path.join(path,'elbow.png'))
+    return
 
 def f(t,d):
     return d.count(t)
@@ -64,7 +92,8 @@ def tfidfScorer(D):
 #Instead of TfIdf Vectorizer
 
 def applysim(m):
-    model = KeyedVectors.load_word2vec_format('../wiki.ko.vec')
+#    model = KeyexydVectors.load_word2vec_format('../wiki.ko.vec')
+    global model
    # return m
     global allwords
     length = len(allwords)
@@ -106,7 +135,7 @@ def weighted_tfidf(data):
         time.append(int(line)/100000)
     for i,doc in enumerate(tfidfScorer(data)):
         tmp=[]
-   #     tmp.append(time[i])
+        tmp.append(time[i])
         for j in doc:
             tmp.append(j[1])
         wtfidf.append(tmp)
@@ -155,9 +184,9 @@ def main():
                                        tokenizer=tokenize_and_stem)
     
     # Fit the vectorizer to text data
- #   tfidf_matrix = tfidf_vectorizer.fit_transform(data['text'])
+    tfidf_matrix = tfidf_vectorizer.fit_transform(data['text'])
     
-    tfidf_matrix = weighted_tfidf(data['text'])
+ #   tfidf_matrix = weighted_tfidf(data['text'])
     
     rows,cols=tfidf_matrix.nonzero()
   #  terms = tfidf_vectorizer.get_feature_names()
@@ -165,6 +194,22 @@ def main():
 
     # Kmeans++
  #   km = SpectralClustering(n_clusters=3,affinity="precomputed",n_neighbors=9)
+    maxK=50
+    sse={}
+
+    for k in range(15,maxK):
+        km = KMeans(n_clusters=k,init='k-means++',max_iter=50, n_init=1,verbose=0,random_state=3425)
+        km.fit(tfidf_matrix)
+        lables = km.labels_
+        print(k,km.labels_)
+        sse[k]=km.inertia_
+        print()
+    plt.figure()
+    plt.plot(list(sse.keys()),list(sse.values()))
+    plt.savefig(os.path.join(path,'kmeans_elbow.png'))
+    
+    return
+    
     km = KMeans(n_clusters=16, init='k-means++', max_iter=10, n_init=1, verbose=0, random_state=3425)
     km.fit(tfidf_matrix)
     labels = km.labels_
@@ -186,6 +231,8 @@ def main():
     plt.title('MDS output of News Headlines')
     plt.savefig(os.path.join(path, 'results\MDS.png'))
 
+
+    return
     # Creating dataframe containing reduced dimensions, identified labels and text data for plotting KMeans output
     df = pd.DataFrame(dict(label=clusters, data=data['text'], x=xs, y=ys))
     df.to_csv(os.path.join(path, 'results\kmeans_clustered_DF.txt'), sep=',')

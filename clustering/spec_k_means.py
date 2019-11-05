@@ -100,7 +100,7 @@ def weighted_tfidf(data):
     while True:
         line = f.readline()
         if not line: break
-        time.append(int(line)/100)
+        time.append(int(line)/10)
     for i,doc in enumerate(tfidfScorer(data)):
         tmp=[]
         tmp.append(time[i])
